@@ -21,3 +21,7 @@ repurpose this code for other microcontrollers with no C++ toolchains
 available, such as the STM8. Code generation would be the best ie. using a
 separate, fancier macro-processor than the stock one bundled with a standard
 C compiler.
+
+## Authors
+
+* **Alexandre Devert** - [marmakoide](https://github.com/marmakoide)
