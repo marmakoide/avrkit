@@ -1,3 +1,8 @@
+/*
+ * Turns on and off the on-board LED of an Arduino UNO board, depending on
+ * the pin 12 state (high or low)
+ */
+
 #include <avr/io.h>
 #include <avr/sleep.h>
 #include <avr/interrupt.h>

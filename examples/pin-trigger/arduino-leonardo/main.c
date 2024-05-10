@@ -1,3 +1,8 @@
+/*
+ * Turns on and off the on-board LED of an Arduino Leonardo board, depending on
+ * the pin 8 state (high or low)
+ */
+
 #include <avr/io.h>
 #include <avr/sleep.h>
 #include <avr/interrupt.h>
