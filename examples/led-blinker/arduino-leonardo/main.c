@@ -1,3 +1,7 @@
+/*
+ * Blinks the on-board LED of an Arduino Leonardo board
+ */
+
 #include <util/delay.h>
 
 #include <avrkit/GPIO.h>
