@@ -1,6 +1,11 @@
 #ifndef AVRKIT_GPIO_H
 #define AVRKIT_GPIO_H
 
+/*
+ * GPIO helper functions
+ */
+
+
 #include <avr/io.h>
 
 #include <avrkit/types.h>
