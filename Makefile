@@ -15,8 +15,13 @@ $(BUILD)/%.o: $(SRC)/%.c
 	@mkdir --parents $(BUILD)
 	$(CC) -I$(INCLUDES) -o $@ -c $(CFLAGS) $<
 
+$(BUILD)/drivers/%.o: $(SRC)/drivers/%.c
+	@mkdir --parents $(BUILD)/drivers
+	$(CC) -I$(INCLUDES) -o $@ -c $(CFLAGS) $<
+
 libavrkit.a: \
-$(BUILD)/TWI.o 
+$(BUILD)/TWI.o \
+$(BUILD)/drivers/sht3x.o
 	$(AR) -r $@ $^
 
 clean:
@@ -24,3 +29,4 @@ clean:
 	@rm -f $(TARGET)
 
 -include $(patsubst $(SRC)/%.c, $(BUILD)/%.deps, $(wildcard $(SRC)/*.c))
+-include $(patsubst $(SRC)/drivers/%.c, $(BUILD)/drivers/%.deps, $(wildcard $(SRC)/drivers/*.c))
