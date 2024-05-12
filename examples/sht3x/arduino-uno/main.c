@@ -98,9 +98,8 @@ main() {
 			tick_counter -= 50;
 			
 			// Read latest measure
-			int16_t temperature = 0;
-			uint16_t humidity = 0;
-			if (!sht3x_acquire_measure(&temperature, &humidity))
+			struct sht3x_measure measure;
+			if (!sht3x_acquire_measure(&measure))
 				fputs("sht3x_acquire_measure failure\r\n", &usart0_output);
 			else {
 				// Initiate the next measure
@@ -111,10 +110,10 @@ main() {
 
 				// Send the measures over the UART
 				fprintf(&usart0_output, "  %d.%uc %u.%u%%\r\n",
-					temperature / 10,
-					temperature % 10,
-					humidity / 10,
-					humidity % 10
+					measure.temperature / 10,
+					measure.temperature % 10,
+					measure.humidity / 10,
+					measure.humidity % 10
 				);
 			}
 		}

@@ -152,9 +152,7 @@ sht3x_request_single_shot_measure(enum sht3x_measure_repeatability repeatability
 
 
 bool
-sht3x_acquire_measure(
-	int16_t* out_temperature,
-	uint16_t* out_humidity) {
+sht3x_acquire_measure(struct sht3x_measure* out) {
 	uint16_t raw_temperature = 0;
 	uint16_t raw_humidity = 0;
 	
@@ -169,13 +167,13 @@ sht3x_acquire_measure(
 	temperature *= 1750;
 	temperature /= 65535;
 	temperature -= 450;
-	*out_temperature = (int16_t)temperature;
+	out->temperature = (int16_t)temperature;
 	
 	// Decode humdity
 	uint32_t humidity = raw_humidity;
 	humidity *= 1000;
 	humidity /= 65535;
-	*out_humidity = (uint16_t)humidity; 
+	out->humidity = (uint16_t)humidity; 
 	
 	// Job done
 	return 1;

@@ -18,6 +18,12 @@ extern uint8_t
 sht3x_i2c_address;
 
 
+struct sht3x_measure {
+	int16_t temperature;
+	uint16_t humidity;
+}; // struct sht3x_measure
+
+
 enum sht3x_measure_repeatability {
 	sht3x_measure_repeatability_low    = 0,
 	sht3x_measure_repeatability_medium = 1,
@@ -49,10 +55,7 @@ sht3x_request_single_shot_measure(
  */
 
 extern bool
-sht3x_acquire_measure(
-	int16_t* temperature,
-	uint16_t* humidity
-);
+sht3x_acquire_measure(struct sht3x_measure* out);
 
 
 #endif /* AVRKIT_DRIVER_SHT3X_H */
