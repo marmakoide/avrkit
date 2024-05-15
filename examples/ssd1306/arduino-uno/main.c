@@ -4,6 +4,8 @@
 
 extern const __flash uint8_t framebuffer_data[1024];
 
+extern const __flash uint8_t font_data[1024];
+
 
 // --- Timer setup ------------------------------------------------------------
 
@@ -44,6 +46,17 @@ main() {
 	ssd1306_display_conf = &ssd1306_128x64_display_conf;
 	ssd1306_init();
 
+	// Write some text
+	ssd1306_upload_start();
+	for(uint8_t i = 0; i < 8; ++i)
+		ssd1306_upload_charmap_8x8(font_data, "012456789ABCDEF", 1);	
+	ssd1306_upload_end();	
+
+	// Do nothing for a while
+	tick_counter = 0;
+	while(tick_counter < 200)
+		sleep_mode();
+	
 	// Upload a picture
 	ssd1306_upload_start();
 	ssd1306_upload_framebuffer(framebuffer_data);

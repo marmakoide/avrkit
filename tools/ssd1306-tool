@@ -98,9 +98,15 @@ def to_font(input_path, array_name, font_format, full_ascii):
     """
 
     if font_format == '8x8':
-        input_shape = (128, 128)
+        if full_ascii:
+            input_shape = (128, 128)
+        else:
+            input_shape = (64, 128)
     elif font_format == '16x16':
-        input_shape = (256, 256)
+        if full_ascii:
+            input_shape = (256, 256)        
+        else:
+            input_shape = (128, 256)
     
     img = load_image(input_path)
     if img.shape[0] != input_shape[0] or img.shape[1] != input_shape[1]:
