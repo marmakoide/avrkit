@@ -21,7 +21,8 @@ $(BUILD)/drivers/%.o: $(SRC)/drivers/%.c
 
 libavrkit.a: \
 $(BUILD)/TWI.o \
-$(BUILD)/drivers/sht3x.o
+$(BUILD)/drivers/sht3x.o \
+$(BUILD)/drivers/ssd1306.o
 	$(AR) -r $@ $^
 
 clean:
