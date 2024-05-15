@@ -73,6 +73,89 @@ setup_timer1() {
 }
 
 
+// --- Send measure to USART --------------------------------------------------
+
+void
+output_measurement(struct sht3x_measure* measure) {
+	fprintf(&usart0_output, "  %d.%uc %u.%u%%\r\n",
+		measure->temperature / 10,
+		measure->temperature % 10,
+		measure->humidity / 10,
+		measure->humidity % 10
+	);
+}
+
+
+// --- Loop using the single shot measurement mode ----------------------------
+
+bool
+single_shot_measurement__start() {
+	if (!sht3x_request_single_shot_measure(sht3x_measure_repeatability_high)) {
+		fputs("sht3x_request_single_shot_measure failure\r\n", &usart0_output);
+		return 0;
+	}
+
+	return 1;
+}
+
+
+bool
+single_shot_measurement__loop() {
+	// Every 50 ticks, ie. every second
+	if (tick_counter >= 50) {
+		tick_counter -= 50;
+		
+		// Read latest measure
+		struct sht3x_measure measure;
+		if (!sht3x_read_single_shot_measure(&measure))
+			fputs("sht3x_acquire_measure failure\r\n", &usart0_output);
+		else {
+			// Initiate the next measure
+			if (!sht3x_request_single_shot_measure(sht3x_measure_repeatability_high)) {
+				fputs("sht3x_request_single_shot_measure failure\r\n", &usart0_output);
+				return 0;
+			}
+
+			// Send the measures over the UART
+			output_measurement(&measure);
+		}
+	}
+
+	return 1;
+}
+
+
+// --- Loop using the periodic measurement mode -------------------------------
+
+bool
+periodic_measurement__start() {
+	if (!sht3x_start_periodic_measure(sht3x_measure_repeatability_high, sht3x_measure_freq_1hz)) {
+		fputs("sht3x_start_periodic_measure failure\r\n", &usart0_output);
+		return 0;
+	}
+
+	return 1;
+}
+
+
+bool
+periodic_measurement__loop() {
+	// Every 52 ticks ie. 1 sec + 20 msec (SHT3x need 13.5 msec in high repeatability modestop acquisition in periodic mode)
+	if (tick_counter >= 49) {
+		tick_counter -= 49;
+		
+		// Read latest measure
+		struct sht3x_measure measure;
+		if (sht3x_read_periodic_measure(&measure))
+			output_measurement(&measure);
+		else
+			fputs("sht3x_read_periodic_measure failure\r\n", &usart0_output);
+	}
+
+	return 1;
+}
+
+
 // --- Main entry point -------------------------------------------------------
 
 int
@@ -84,46 +167,28 @@ main() {
 	twi_set_speed(TWI_FREQ_FAST);
 	sei();
 
-	// Initiate the first measure
-	fputs("starting acquisition loop ...\r\n", &usart0_output);
-	if (!sht3x_request_single_shot_measure(sht3x_measure_repeatability_high)) {
-		fputs("sht3x_request_single_shot_measure failure\r\n", &usart0_output);
-		goto waiting_loop;
-	}
-
+	// Display status
+	uint16_t status = 0;
+	if (!sht3x_read_status(&status))
+		fputs("sht3x_read_status failure\r\n", &usart0_output);
+	else
+		fprintf(&usart0_output, "status = 0x%04\r\n", status);
+	
 	// Main loop
-	while(1) {
-		// Every 200 ticks
-		if (tick_counter >= 50) {
-			tick_counter -= 50;
-			
-			// Read latest measure
-			struct sht3x_measure measure;
-			if (!sht3x_acquire_measure(&measure))
-				fputs("sht3x_acquire_measure failure\r\n", &usart0_output);
-			else {
-				// Initiate the next measure
-				if (!sht3x_request_single_shot_measure(sht3x_measure_repeatability_high)) {
-					fputs("sht3x_request_single_shot_measure failure\r\n", &usart0_output);
-					goto waiting_loop;
-				}
-
-				// Send the measures over the UART
-				fprintf(&usart0_output, "  %d.%uc %u.%u%%\r\n",
-					measure.temperature / 10,
-					measure.temperature % 10,
-					measure.humidity / 10,
-					measure.humidity % 10
-				);
-			}
-		}
-
-		// Enter sleep mode
-		sleep_mode();
+	fputs("starting acquisition loop ...\r\n", &usart0_output);	
+	/*
+	if (single_shot_measurement__start()) {
+		while(single_shot_measurement__loop())
+			sleep_mode();
+	}
+	*/
+	if (periodic_measurement__start()) {
+		while(periodic_measurement__loop())
+			sleep_mode();
 	}
 	
 	// Wait, do nothing loop
-	waiting_loop:
+	fputs("acquisition loop stopped\r\n", &usart0_output);
 	while(1)
 	    sleep_mode();
 }
