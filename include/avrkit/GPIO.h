@@ -52,6 +52,12 @@ gpio_pin_ ## PORT_ID ## PIN_ID ## __set_low() { \
     PORT ## PORT_ID &= ~(1 << ( PORT ## PORT_ID ## PIN_ID )); \
 }
 
+#define GPIO__TOGGLE_PIN(PORT_ID, PIN_ID) \
+inline static void \
+gpio_pin_ ## PORT_ID ## PIN_ID ## __toggle() { \
+    PORT ## PORT_ID ^= 1 << ( PORT ## PORT_ID ## PIN_ID ); \
+}
+
 #define GPIO__ENABLE_CHANGE_INTERRUPT(PORT_ID, PIN_ID, PIN_GROUP_ID, PIN_INTERRUPT_ID) \
 inline static void \
 gpio_pin_ ## PORT_ID ## PIN_ID ## __enable_change_interrupt() { \
@@ -70,7 +76,8 @@ gpio_pin_ ## PORT_ID ## PIN_ID ## __enable_change_interrupt() { \
     GPIO__SET_PIN_AS_OUTPUT(PORT_ID, PIN_ID) \
     GPIO__SET_PIN_AS_INPUT(PORT_ID, PIN_ID) \
     GPIO__SET_PIN_HIGH(PORT_ID, PIN_ID) \
-    GPIO__SET_PIN_LOW(PORT_ID, PIN_ID)
+    GPIO__SET_PIN_LOW(PORT_ID, PIN_ID) \
+    GPIO__TOGGLE_PIN(PORT_ID, PIN_ID)
 
 #define INSTANCIATE_GPIO_PIN_DEFINITIONS_WITH_CHANGE_INTERRUPT(PORT_ID, PIN_ID, PIN_GROUP_ID, PIN_INTERRUPT_ID) \
 	INSTANCIATE_GPIO_PIN_DEFINITIONS(PORT_ID, PIN_ID) \
