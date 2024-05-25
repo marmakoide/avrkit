@@ -18,14 +18,20 @@ ISR(TIMER1_COMPA_vect) {
 
 static void
 setup_timer1() {
-	// Clear timer on compare match
-	TCCR1B |= _BV(WGM12);
-
 	// Reset timer after 1250 ticks ie. 1/50 sec on a (16/256) clock
 	OCR1A = 1249;
 
+	timer1__set_CTC_mode();
 	timer1__enable_compare_A_interrupt();
 	timer1__start_with_premultiplier_256();
+}
+
+
+static void
+sleep_until_n_ticks(int16_t tick_count) {
+	tick_counter = 0;
+	while(tick_counter < tick_count)
+		sleep_mode();
 }
 
 
@@ -51,9 +57,7 @@ main() {
 	ssd1306_upload_end();	
 
 	// Do nothing for a while
-	tick_counter = 0;
-	while(tick_counter < 200)
-		sleep_mode();
+	sleep_until_n_ticks(200);
 	
 	// Upload a picture
 	ssd1306_upload_start();
@@ -61,10 +65,8 @@ main() {
 	ssd1306_upload_end();
 
 	// Do nothing for a while
-	tick_counter = 0;
-	while(tick_counter < 200)
-		sleep_mode();
-	
+	sleep_until_n_ticks(200);
+
 	// Flash the screen content for a while
 	tick_counter = 0;
 	for(uint8_t count = 30; count != 0; --count) {
@@ -80,18 +82,12 @@ main() {
 	}
 
 	// Do nothing for a while
-	tick_counter = 0;
-	while(tick_counter < 200)
-		sleep_mode();
+	sleep_until_n_ticks(200);
 	
 	// Scroll the screen content for a while
 	ssd1306_setup_horizontal_scroll(0, 7, 0, ssd1306_scroll_speed__5);
 	ssd1306_activate_scroll();
-	
-	tick_counter = 0;
-	while(tick_counter < 3000)
-		sleep_mode();
-	
+	sleep_until_n_ticks(3000);	
 	ssd1306_deactivate_scroll();
 	
 	// Sleep forever
