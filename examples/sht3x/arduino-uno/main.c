@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <avrkit/TWI.h>
+#include <avrkit/timer.h>
 #include <avrkit/drivers/sht3x.h>
 
 
@@ -59,17 +60,13 @@ ISR(TIMER1_COMPA_vect) {
 
 static void
 setup_timer1() {
-	// Clear timer on compare match
-	TCCR1B |= _BV(WGM12);
-
-	// Set prescaler to 256
-	TCCR1B |= _BV(CS12);
-
 	// Reset timer after 1250 ticks ie. 1/50 sec on a (16/256) clock
 	OCR1A = 1249;
 	
 	// Trigger TIMER1_COMPA interruption
-	TIMSK1 |= _BV(OCIE1A);
+	timer1__set_CTC_mode();
+	timer1__enable_compare_A_interrupt();
+	timer1__start_with_premultiplier_256();
 }
 
 
