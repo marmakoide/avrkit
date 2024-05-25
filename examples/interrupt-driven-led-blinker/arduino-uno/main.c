@@ -16,12 +16,10 @@
 
 static void
 setup_timer1() {
-	// Clear timer on compare match
-	TCCR1B |= _BV(WGM12);
-
 	// Reset timer after 15625 ticks ie. 1 sec on a 16 / 1024 Mhz clock
 	OCR1A = 15624;
 
+	timer1__set_CTC_mode();
 	timer1__enable_compare_A_interrupt();
 	timer1__start_with_premultiplier_1024();
 } 
